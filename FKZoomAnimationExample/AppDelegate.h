@@ -1,9 +1,8 @@
 //
 //  AppDelegate.h
-//  AnimationTest
+//  FKZoomAnimationExample
 //
-//  Created by Santosh Narawade on 08/04/16.
-//  Copyright (c) 2016 Santosh Narawade. All rights reserved.
+//  Created by Firoz Khan on 08/04/16.
 //
 
 #import <UIKit/UIKit.h>
