@@ -27,9 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class UIView;
 
+typedef void(^CompletionBlock)(void);
+
 @interface FKZoomAnimation : NSObject
 
-- (void)animateFromView:(__kindof UIView *)fromView toView:(__kindof UIView *)toView;
+- (void)animateFromView:(__kindof UIView *)fromView toView:(__kindof UIView *)toView completion:(nullable CompletionBlock)completion;
 
 @end
 

@@ -30,15 +30,17 @@
 @property (strong, nonatomic) __kindof UIView *toView;
 @property (strong, nonatomic) UIView *selfFrameView;
 @property (strong, nonatomic) UIImageView *selectedImage;
+@property (copy) CompletionBlock completion;
 
 @end
 
 @implementation FKZoomAnimation
 
-- (void)animateFromView:(__kindof UIView *)fromView toView:(__kindof UIView *)toView {
+- (void)animateFromView:(__kindof UIView *)fromView toView:(__kindof UIView *)toView completion:(nullable CompletionBlock)completion {
     
     _fromView = fromView;
     _toView = toView;
+    _completion = completion;
     
     CGRect cellframe = _fromView.frame;
     _selfFrameView = [[UIView alloc] initWithFrame:cellframe];
@@ -53,6 +55,7 @@
     [_selfFrameView addSubview:_selectedImage];
     
     [UIView animateWithDuration:0.50 animations:^{
+        
         [self->_selfFrameView setFrame:CGRectInset(self->_toView.safeAreaLayoutGuide.layoutFrame, 0, 0)];
         self->_selfFrameView.backgroundColor = [UIColor colorWithWhite:1 alpha:1];
         self->_selectedImage.layer.cornerRadius = 0;
@@ -74,25 +77,28 @@
     }];
 }
 
--(void)backButtonPressed:(UIButton *)sender{
+-(void)backButtonPressed:(UIButton *)sender {
     
-        [UIView animateWithDuration:0.01 animations:^{
-            [sender setFrame:CGRectMake(0, 0, 0, 0)];
+    [UIView animateWithDuration:0.01 animations:^{
+        
+        [sender setFrame:CGRectMake(0, 0, 0, 0)];
+        
+    } completion:^(BOOL finished) {
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            [self->_selfFrameView setFrame:self->_fromView.frame];
+            [self->_selectedImage setFrame:CGRectInset(self->_selfFrameView.bounds, 0, 0)];
+            
+            self->_selectedImage.layer.cornerRadius = self->_selectedImage.frame.size.width/2;
+            self->_selectedImage.clipsToBounds = YES;
         } completion:^(BOOL finished) {
-    
-            NSInteger tag = self->_fromView.tag;
-    
-            [UIView animateWithDuration:0.5 animations:^{
-                [self->_selfFrameView setFrame:_fromView.frame];
-                [self->_selectedImage setFrame:CGRectInset(self->_selfFrameView.bounds, 0, 0)];
-    
-                self->_selectedImage.layer.cornerRadius = self->_selectedImage.frame.size.width/2;
-                self->_selectedImage.clipsToBounds = YES;
-            } completion:^(BOOL finished) {
-                [self->_selfFrameView removeFromSuperview];
-//                _toView.scrollEnabled = YES;
-            }];
+            [self->_selfFrameView removeFromSuperview];
+            
+            if (self->_completion) {
+                self->_completion();
+            }
         }];
+    }];
 }
 
 @end
